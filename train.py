@@ -111,3 +111,4 @@ if __name__ == '__main__':
         data_collator=data_collator,
     )
     trainer.train()
+    trainer.save_model()
