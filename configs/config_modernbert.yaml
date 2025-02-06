@@ -10,8 +10,6 @@ subtoken_pooling: first
 fuse_layers: false
 post_fusion_schema: "l2l-l2t-t2t"
 span_mode: markerV0
-# words_splitter_type: "mecab" # 'whitespace', 'spacy', 'jieba', 'hanlp' and 'mecab'
-# token_splitter: "mecab-ko"
 words_splitter_type: "mecab"
 
 # Training Parameters
