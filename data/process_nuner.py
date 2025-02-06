@@ -39,13 +39,13 @@ def process_entities(dataset):
 def save_data_to_file(data, filepath):
     """Saves the processed data to a JSON file."""
     with open(filepath, 'w') as f:
-        json.dump(data, f)
+        json.dump(data, f, indent=2)
 
 
 if __name__ == "__main__":
     dataset = load_dataset("numind/NuNER")
     processed_data = process_entities(dataset)
 
-    save_data_to_file(processed_data, 'nuner_train.json')
+    save_data_to_file(processed_data, './data/nuner_train.json')
 
     print("dataset size:", len(processed_data))

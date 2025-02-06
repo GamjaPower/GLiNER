@@ -1,5 +1,5 @@
 import os
-os.environ["TOKENIZERS_PARALLELISM"] = "true"
+os.environ["TOKENIZERS_PARALLELISM"] = "false"
 import argparse
 import random
 import json
@@ -13,8 +13,19 @@ from gliner.data_processing.collator import DataCollatorWithPadding, DataCollato
 from gliner.utils import load_config_as_namespace
 from gliner.data_processing import WordsSplitter, GLiNERDataset
 
+import sys 
+import platform
+import os
+
 
 if __name__ == '__main__':
+
+    if platform.system() == 'Darwin':
+        os.environ["TOKENIZERS_PARALLELISM"] = "false"
+        dataloader_num_workers = 0
+    else: 
+        dataloader_num_workers = 8
+
     parser = argparse.ArgumentParser()
     parser.add_argument('--config', type=str, default= "configs/config.yaml")
     parser.add_argument('--log_dir', type=str, default = 'models/')
@@ -93,10 +104,10 @@ if __name__ == '__main__':
         per_device_eval_batch_size=config.train_batch_size,
         max_grad_norm=config.max_grad_norm,
         max_steps=config.num_steps,
-        evaluation_strategy="epoch",
+        eval_strategy="epoch",
         save_steps = config.eval_every,
         save_total_limit=config.save_total_limit,
-        dataloader_num_workers = 8,
+        dataloader_num_workers = dataloader_num_workers,
         use_cpu = False,
         report_to="none",
         bf16=True,
@@ -107,7 +118,7 @@ if __name__ == '__main__':
         args=training_args,
         train_dataset=train_dataset,
         eval_dataset=test_dataset,
-        tokenizer=tokenizer,
+        processing_class=tokenizer,
         data_collator=data_collator,
     )
     trainer.train()

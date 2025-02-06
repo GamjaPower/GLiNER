@@ -176,5 +176,13 @@ poetry.toml
 # ruff
 .ruff_cache/
 
+# Mac
+.DS_Store
+
+
 # LSP config files
 pyrightconfig.json
+
+
+
+data/nuner_train.json
