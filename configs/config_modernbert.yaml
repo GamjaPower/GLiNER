@@ -14,7 +14,7 @@ span_mode: markerV0
 words_splitter_type: "mecab"
 
 # Training Parameters
-num_steps: 100000
+num_steps: 10000
 train_batch_size: 8
 eval_every: 5000
 warmup_ratio: 0.05
@@ -36,7 +36,7 @@ max_grad_norm: 10.0
 
 # Directory Paths
 root_dir: gliner_logs
-log_dir: ./labs/logs
+log_dir: "./labs/logs"
 train_data: "./labs/nuner_train.json" #"data/nuner_train.json" # see https://github.com/urchade/GLiNER/tree/main/data
 val_data_dir: "none"
 # "NER_datasets": val data from the paper can be obtained from "https://drive.google.com/file/d/1T-5IbocGka35I7X3CE6yKe5N_Xg2lVKT/view"
@@ -45,7 +45,7 @@ val_data_dir: "none"
 # Use "none" if no pretrained model is being used
 prev_path: null
 
-save_total_limit: 3 #maximum amount of checkpoints to save
+save_total_limit: 10 #maximum amount of checkpoints to save
 
 # Advanced Training Settings
 size_sup: -1
