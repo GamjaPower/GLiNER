@@ -105,6 +105,7 @@ if __name__ == '__main__':
         max_grad_norm=config.max_grad_norm,
         max_steps=config.num_steps,
         eval_strategy="epoch",
+        save_strategy="epoch",
         save_steps = config.eval_every,
         save_total_limit=config.save_total_limit,
         dataloader_num_workers = dataloader_num_workers,
