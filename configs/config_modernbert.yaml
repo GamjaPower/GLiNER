@@ -1,4 +1,5 @@
 # Model Configuration
+# model_name: "microsoft/deberta-v3-small" # Hugging Face model
 model_name: "./labs/models/modernbert-base-kr" # Hugging Face model
 # labels_encoder: "./labs/models/modernbert-base-kr"
 labels_encoder: "BAAI/bge-small-en-v1.5"
@@ -14,9 +15,9 @@ span_mode: markerV0
 words_splitter_type: "mecab"
 
 # Training Parameters
-num_steps: 10000
+num_steps: 100000
 train_batch_size: 8
-eval_every: 5000
+eval_every: 1000
 warmup_ratio: 0.05
 scheduler_type: "cosine"
 

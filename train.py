@@ -13,18 +13,52 @@ from gliner.data_processing.collator import DataCollatorWithPadding, DataCollato
 from gliner.utils import load_config_as_namespace
 from gliner.data_processing import WordsSplitter, GLiNERDataset
 
+from sklearn.metrics import f1_score
+
 import sys 
 import platform
 import os
 
 
-if __name__ == '__main__':
+def compute_metrics(pred):
+    labels = pred.label_ids
+    preds = pred.predictions.argmax(-1)
+    f1 = f1_score(labels, preds, average='weighted')
+    return {
+        'f1': 'f1',
+    }
+
+
+# # 평가 메트릭 함수
+# def compute_metrics(pred):
+#     labels = pred.label_ids
+#     preds = pred.predictions.argmax(-1)
+#     precision, recall, f1, _ = precision_recall_fscore_support(
+#         labels, 
+#         preds, 
+#         average='macro'
+#     )
+#     acc = accuracy_score(labels, preds)
+#     return {
+#         'accuracy': acc,
+#         'f1': f1,
+#         'precision': precision,
+#         'recall': recall
+#     }
+
+
+def train():
 
     if platform.system() == 'Darwin':
         os.environ["TOKENIZERS_PARALLELISM"] = "false"
         dataloader_num_workers = 0
+        tf32_flag = False
+        bf16_flag = True
     else: 
         dataloader_num_workers = 8
+        tf32_flag = True
+        bf16_flag = False
+    
 
     parser = argparse.ArgumentParser()
     parser.add_argument('--config', type=str, default= "configs/config.yaml")
@@ -44,12 +78,12 @@ if __name__ == '__main__':
 
     print('Dataset size:', len(data))
     #shuffle
-    random.shuffle(data)    
+    random.seed(36)
+    random.shuffle(data)
     print('Dataset is shuffled...')
 
     train_data = data[:int(len(data)*0.9)]
     test_data = data[int(len(data)*0.9):]
-
     print('Dataset is splitted...')
 
 
@@ -92,6 +126,7 @@ if __name__ == '__main__':
         test_dataset = test_data
         data_collator = DataCollator(model.config, data_processor=model.data_processor, prepare_labels=True)
 
+    
     training_args = TrainingArguments(
         output_dir=config.log_dir,
         learning_rate=float(config.lr_encoder),
@@ -104,15 +139,22 @@ if __name__ == '__main__':
         per_device_eval_batch_size=config.train_batch_size,
         max_grad_norm=config.max_grad_norm,
         max_steps=config.num_steps,
-        eval_strategy="epoch",
-        save_steps = config.eval_every,
+        # by step
+        eval_strategy="steps",
+        save_strategy="steps",
+        save_steps=config.eval_every,
+        eval_steps=config.eval_every,
+        # by epoch
+        # eval_strategy="epoch",
+        # save_strategy="epoch",
         save_total_limit=config.save_total_limit,
         dataloader_num_workers = dataloader_num_workers,
         use_cpu = False,
         report_to="none",
-        bf16=True,
-        )
-
+        bf16=bf16_flag,
+        tf32=tf32_flag,
+    )
+    
     trainer = Trainer(
         model=model,
         args=training_args,
@@ -120,6 +162,11 @@ if __name__ == '__main__':
         eval_dataset=test_dataset,
         processing_class=tokenizer,
         data_collator=data_collator,
+        # compute_metrics=compute_metrics
     )
     trainer.train()
     trainer.save_model('./labs/final_model')
+
+if __name__ == '__main__':
+
+    train()
